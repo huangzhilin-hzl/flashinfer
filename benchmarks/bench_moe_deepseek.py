@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""DeepSeek-V3 MoE Performance Benchmark - CuteDSL vs CUTLASS vs TRTLLM.
+"""DeepSeek MoE Performance Benchmark.
 
-Compares three NVFP4 MoE backends on DeepSeek-V3 configuration:
+Compares MoE backend implementations on DeepSeek model configurations:
 - CuteDSL: FlashInfer's CuteDSL-based implementation
 - CUTLASS: NVIDIA CUTLASS-based implementation
 - TRTLLM: TensorRT-LLM's implementation
@@ -14,12 +14,18 @@ Usage:
     python bench_moe_deepseek.py --gen-phase
 
     # With Expert Parallelism simulation
-    python bench_moe_deepseek.py --ep 1    # 256 local experts (no parallelism)
-    python bench_moe_deepseek.py --ep 8    # 32 local experts (8-way EP)
-    python bench_moe_deepseek.py --ep 16   # 16 local experts (16-way EP)
+    python bench_moe_deepseek.py --ep 1    # all experts on one GPU
+    python bench_moe_deepseek.py --ep 8    # num_experts / 8 local experts
+    python bench_moe_deepseek.py --ep 16   # num_experts / 16 local experts
 
     # Custom token counts
     python bench_moe_deepseek.py --num-tokens 64,128,256
+
+    # DeepSeek-V4 Flash benchmark
+    python bench_moe_deepseek.py --model deepseek-v4-flash
+
+    # DeepSeek-V4 Pro benchmark
+    python bench_moe_deepseek.py --model deepseek-v4-pro --ep 1
 
     # Disable CUDA graph (useful for debugging or profiling)
     python bench_moe_deepseek.py --no-cuda-graph
@@ -48,34 +54,58 @@ class DeepSeekConfig:
     topk_group: int = 4
     top_k: int = 8
     routed_scaling_factor: float = 2.5
+    name: str = "DeepSeek-V3"
 
 
-CFG = DeepSeekConfig()
+MODEL_CONFIGS = {
+    "deepseek-v3": DeepSeekConfig(name="DeepSeek-V3"),
+    "deepseek-v4-flash": DeepSeekConfig(
+        hidden_size=4096,
+        intermediate_size=2048,
+        num_experts=256,
+        top_k=6,
+        name="DeepSeek-V4 Flash",
+    ),
+    "deepseek-v4-pro": DeepSeekConfig(
+        hidden_size=7168,
+        intermediate_size=3072,
+        num_experts=384,
+        top_k=6,
+        name="DeepSeek-V4 Pro",
+    ),
+}
+
+CFG = MODEL_CONFIGS["deepseek-v3"]
 TOKEN_COUNTS = [128, 256, 512, 1024, 2048, 4096]
 
 # Generation phase token counts (small batches typical in decode)
 GEN_PHASE_TOKENS = [1, 2, 4, 8, 16, 32, 64, 128]
 
-# Expert Parallelism configurations
-# EP=1: all 256 experts on single GPU
-# EP=8: 32 experts per GPU (256/8)
-# EP=16: 16 experts per GPU (256/16)
-EP_CONFIGS = {
-    1: {"num_local_experts": 256, "local_expert_offset": 0},
-    8: {"num_local_experts": 32, "local_expert_offset": 0},
-    16: {"num_local_experts": 16, "local_expert_offset": 0},
-}
+# Expert Parallelism configurations.  The local expert count is model-dependent
+# because DeepSeek-V4 Pro uses more routed experts than DeepSeek-V3/Flash.
+EP_CONFIGS = (1, 8, 16)
 
 
-def is_sm100_family():
-    """Check for SM100 family (Blackwell: SM100, SM103).
+def get_ep_config(ep_config):
+    if ep_config not in EP_CONFIGS:
+        raise ValueError(
+            f"Unsupported EP config {ep_config}; expected one of {EP_CONFIGS}"
+        )
+    if CFG.num_experts % ep_config != 0:
+        raise ValueError(
+            f"{CFG.name} num_experts={CFG.num_experts} must be divisible by EP={ep_config}"
+        )
+    return {
+        "num_local_experts": CFG.num_experts // ep_config,
+        "local_expert_offset": 0,
+    }
 
-    CuteDSL MoE NVFP4 kernels are optimized for SM10x architecture.
-    """
+
+def get_compute_capability():
     if not torch.cuda.is_available():
-        return False
+        return None
     props = torch.cuda.get_device_properties(0)
-    return props.major == 10
+    return props.major, props.minor
 
 
 def calc_tflops(n, ms, num_local_experts=None):
@@ -210,7 +240,7 @@ def bench_cute_dsl(
 
     Args:
         use_wrapper: If True, use CuteDslMoEWrapper API (recommended for CUDA graph).
-                    If False, use cute_dsl_fused_moe_nvfp4 functional API.
+                    If False, use the functional API.
         do_autotune: If True, run the pre-warm pass under autotune(True) so the
                     autotuner profiles all buckets and populates its cache. The
                     measurement loop runs OUTSIDE the autotune context so that
@@ -670,7 +700,7 @@ def run_benchmark(
     routing_bias_scale=0.01,
 ):
     """
-    Unified benchmark for DeepSeek-V3 MoE backends.
+    Unified benchmark for DeepSeek MoE backends.
 
     Autotuning runs in each backend's pre-warm step (under ``autotune(True)``)
     so the autotuner profiles all tactics on the default stream before
@@ -700,8 +730,8 @@ def run_benchmark(
     Returns:
         List of BenchResult objects
     """
-    # Get EP configuration
-    ep_cfg = EP_CONFIGS.get(ep_config, EP_CONFIGS[1])
+    # Get model-dependent EP configuration.
+    ep_cfg = get_ep_config(ep_config)
     num_local = ep_cfg["num_local_experts"]
     local_offset = ep_cfg["local_expert_offset"]
 
@@ -820,7 +850,7 @@ def _print_header(
 ):
     """Print benchmark header."""
     print("\n" + "=" * 120)
-    print(f"DeepSeek-V3 MoE Benchmark: CuteDSL vs CUTLASS vs TRTLLM (EP={ep_config})")
+    print(f"{CFG.name} MoE Benchmark: CuteDSL vs CUTLASS vs TRTLLM (EP={ep_config})")
     print("=" * 120)
     print(
         f"Model: hidden={CFG.hidden_size}, intermediate={CFG.intermediate_size}, "
@@ -940,14 +970,22 @@ def _collect_expert_histogram(inputs, num_local, local_offset):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="DeepSeek-V3 MoE Performance Benchmark"
+    parser = argparse.ArgumentParser(description="DeepSeek MoE Performance Benchmark")
+    parser.add_argument(
+        "--model",
+        type=str,
+        default="deepseek-v3",
+        choices=sorted(MODEL_CONFIGS),
+        help="DeepSeek model configuration to benchmark.",
     )
     parser.add_argument(
         "--num-tokens",
         type=str,
         default=None,
-        help="Comma-separated token counts (default: 128-4096 for throughput, 1-128 for gen-phase)",
+        help=(
+            "Comma-separated token counts (default: 128-4096, or 1-128 with "
+            "--gen-phase)"
+        ),
     )
     parser.add_argument("--warmup", type=int, default=10, help="Warmup iterations")
     parser.add_argument("--iters", type=int, default=100, help="Benchmark iterations")
@@ -962,8 +1000,8 @@ def main():
         "--ep",
         type=int,
         default=1,
-        choices=[1, 8, 16],
-        help="Expert Parallelism: 1 (256 local), 8 (32 local), 16 (16 local)",
+        choices=EP_CONFIGS,
+        help="Expert Parallelism for implementation comparison.",
     )
     parser.add_argument(
         "--no-cuda-graph",
@@ -988,22 +1026,26 @@ def main():
     )
     args = parser.parse_args()
 
-    if not is_sm100_family():
-        print("ERROR: Requires SM100 family GPU (Blackwell: SM100, SM103)")
-        return 1
+    global CFG
+    CFG = MODEL_CONFIGS[args.model]
 
     # Determine token counts
     if args.num_tokens:
         tokens = [int(x) for x in args.num_tokens.split(",")]
     elif args.gen_phase:
-        tokens = GEN_PHASE_TOKENS  # [1, 2, 4, 8, 16, 32, 64, 128]
+        tokens = GEN_PHASE_TOKENS
     else:
         tokens = TOKEN_COUNTS  # [128, 256, 512, 1024, 2048, 4096]
 
-    print("\nDeepSeek-V3 MoE Performance Benchmark")
-    print(f"GPU: {torch.cuda.get_device_name(0)}")
-    print(f"CuteDSL API: {'Functional' if args.functional_api else 'Wrapper'}")
+    compute_capability = get_compute_capability()
+    if compute_capability is None:
+        print("ERROR: DeepSeek MoE benchmark requires a CUDA GPU.")
+        return 1
 
+    print(f"\n{CFG.name} MoE Performance Benchmark")
+    print(f"GPU: {torch.cuda.get_device_name(0)}")
+    print(f"Compute capability: SM{compute_capability[0]}{compute_capability[1]}")
+    print(f"CuteDSL API: {'Functional' if args.functional_api else 'Wrapper'}")
     run_benchmark(
         token_counts=tokens,
         warmup=args.warmup,
