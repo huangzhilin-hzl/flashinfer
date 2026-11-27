@@ -1,0 +1,20 @@
+flashinfer/fused_moe/api.py
+  h_65d95dfcbf63bf 2307,3724,3730-3732,3735-3752,3760
+flashinfer/fused_moe/cute_dsl/fused_moe.py
+  h_65d95dfcbf63bf 1481-1482,1609-1611,1628,1692-1702,2276-2279,2353-2355,2371-2372
+flashinfer/fused_moe/runners.py
+  h_65d95dfcbf63bf 27,5154-5158,5162,5201-5202,6217,6594,8514-8515,8760-8761,9041-9052,9237-9238,9259-9269
+tests/cpu/moe/test_moe_default_backend.py
+  h_65d95dfcbf63bf 1-676
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "2a185a2d98c6af0edc965a80b58e8f54d8cb5a30",
+  "prompts": {},
+  "humans": {
+    "h_65d95dfcbf63bf": {
+      "author": "墨楼 <huangzhilin.hzl@antgroup.com>"
+    }
+  }
+}
