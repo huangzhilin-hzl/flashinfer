@@ -1,0 +1,30 @@
+flashinfer/attention/cute_dsl/sm120_fmha.py
+  h_65d95dfcbf63bf 85,87-88
+flashinfer/cute_dsl/attention/fmha/sm120/compile.py
+  h_65d95dfcbf63bf 323-324,376-377
+flashinfer/decode.py
+  h_65d95dfcbf63bf 2937,2948
+flashinfer/prefill.py
+  h_65d95dfcbf63bf 58-62,130-131,903,3155-3542,3728,3915,3964-3968,3979-4006,4038,4059,4061-4063,4067,4069-4094,4096-4100,4102-4393,4544-4558,4561,4587-4626,4629-4632,4634-4670,4689-4692,4980,5001,5003-5004,5013-5015,5019-5060,5360-5362,5366,5412-5415,5462,5470-5474,5476-5492,5498-5545,5547,5796,6159,6161-6168,6170,6215,6891
+tests/attention/test_batch_prefill.py
+  h_65d95dfcbf63bf 126-129,321
+tests/attention/test_sm120_fmha.py
+  h_65d95dfcbf63bf 27-28
+tests/attention/test_sm120_fmha_paged.py
+  h_65d95dfcbf63bf 26-27
+tests/attention/test_sm120_prims_prefill_backend.py
+  h_65d95dfcbf63bf 22,24
+tests/cpu/attention/test_paged_prefill_auto_backend.py
+  h_65d95dfcbf63bf 1-1006
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "e2c3225840198827a84d58dc0426c739245f1024",
+  "prompts": {},
+  "humans": {
+    "h_65d95dfcbf63bf": {
+      "author": "墨楼 <huangzhilin.hzl@antgroup.com>"
+    }
+  }
+}
