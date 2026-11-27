@@ -1,0 +1,22 @@
+csrc/nv_internal/tensorrt_llm/thop/fp4Quantize.cpp
+  h_65d95dfcbf63bf 272-279,364-389,395-396
+csrc/nv_internal/tensorrt_llm/thop/fp4Quantize.h
+  h_65d95dfcbf63bf 47,51-61
+flashinfer/quantization/fp4_quantization.py
+  h_65d95dfcbf63bf 18,301-314,598-609,618,623-640,642-651,1911-1932
+tests/utils/test_fp4_dispatch.py
+  h_65d95dfcbf63bf 374-375,377-380,382,404,407-526
+tests/utils/test_fp4_quantize.py
+  h_65d95dfcbf63bf 2964-2986,3015-3021,3026-3027,3040-3050,3077,3081
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "1e1645c1271db13decd5ac2dcfe2355f9f5e77d5",
+  "prompts": {},
+  "humans": {
+    "h_65d95dfcbf63bf": {
+      "author": "墨楼 <huangzhilin.hzl@antgroup.com>"
+    }
+  }
+}
