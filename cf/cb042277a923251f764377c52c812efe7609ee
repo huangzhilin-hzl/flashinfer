@@ -1,0 +1,22 @@
+flashinfer/cute_dsl/sparse/bsa_attn_sm120.py
+  h_65d95dfcbf63bf 382,387-388,397-398,549,551
+flashinfer/cute_dsl/sparse/bsa_utils/sage_quant_sm120.py
+  h_65d95dfcbf63bf 363-368,410,462,592
+flashinfer/sparse.py
+  h_65d95dfcbf63bf 18,20,211-242,464-469,476-479,508-519,526-529,531-715,857-858,875-876,883-884,887-888,918,926-959,966,968,970-972,974,993,1011-1014,1026,1119-1132,1140-1141,1214,1227,1238-1242,1250-1251,1268-1275,1334,1343,1347,1363,1365-1366,1374,1376-1381,1395,1443-1447,1450-1451,1454,1463,1467-1470,1479-1481,1483-1488,1521,1524,1529-1530,1544-1545,1548,1557,1576,1581,1590,1592,1613,1620,1626,1630-1648,2051-2052,2213-2214,2219,2222,2248,2335-2338,2342,2358-2360,2364,2374,2383,2413,2419,2423-2432
+tests/attention/test_vsa_block_sparse_sm120_sage.py
+  h_65d95dfcbf63bf 29-30,36-37
+tests/cpu/attention/test_block_sparse_auto_backend.py
+  h_65d95dfcbf63bf 1-1256
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "cfcb042277a923251f764377c52c812efe7609ee",
+  "prompts": {},
+  "humans": {
+    "h_65d95dfcbf63bf": {
+      "author": "墨楼 <huangzhilin.hzl@antgroup.com>"
+    }
+  }
+}
