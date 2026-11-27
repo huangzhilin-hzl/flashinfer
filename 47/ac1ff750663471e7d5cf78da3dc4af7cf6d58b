@@ -1,0 +1,28 @@
+flashinfer/aot.py
+  h_65d95dfcbf63bf 334,508,521,541-542,558,561,745,995,998-999,1001-1004,1013-1014,1017-1019,1024,1027-1038,1040,1048-1062,1157,1163,1165,1168-1169,1238-1242,1251-1264,1359-1368,1394
+flashinfer/comm/mixed_comm.py
+  h_65d95dfcbf63bf 1453
+flashinfer/cute_dsl/attention/monolithic/mla_decode_fp16.py
+  h_65d95dfcbf63bf 56-62
+flashinfer/cute_dsl/attention/monolithic/mla_decode_fp8.py
+  h_65d95dfcbf63bf 56-62
+flashinfer/gemm/gemm_base.py
+  h_65d95dfcbf63bf 1771,1851,1929,2013,2133,2229
+flashinfer/mla/_sparse_mla_sm120/_dsv4_nvfp4.py
+  h_65d95dfcbf63bf 235,244-245,303
+tests/cpu/gemm/test_sm107_sm121_arch_capabilities.py
+  h_65d95dfcbf63bf 1-188
+tests/cpu/infra/test_aot_sm107_sm121_modules.py
+  h_65d95dfcbf63bf 1-449
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "47ac1ff750663471e7d5cf78da3dc4af7cf6d58b",
+  "prompts": {},
+  "humans": {
+    "h_65d95dfcbf63bf": {
+      "author": "墨楼 <huangzhilin.hzl@antgroup.com>"
+    }
+  }
+}
