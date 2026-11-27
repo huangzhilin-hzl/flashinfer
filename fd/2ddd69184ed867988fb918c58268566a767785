@@ -1,0 +1,18 @@
+flashinfer/sparse.py
+  h_65d95dfcbf63bf 573,650,666,670-672,716,951
+tests/attention/test_vsa_block_sparse.py
+  h_65d95dfcbf63bf 260,279,291,307,313-331
+tests/cpu/attention/test_block_sparse_auto_backend.py
+  h_65d95dfcbf63bf 268,290,312-316,334,367,389,420,443,459-464,492,501,503-568,575,580-601,605-614,640,661,693,716,735-738,755,764-794,796-802,806,825,846,896,918,942,992,1018,1035,1051
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "fd2ddd69184ed867988fb918c58268566a767785",
+  "prompts": {},
+  "humans": {
+    "h_65d95dfcbf63bf": {
+      "author": "墨楼 <huangzhilin.hzl@antgroup.com>"
+    }
+  }
+}
